@@ -31,8 +31,8 @@ const DateTime = () => {
         return () => clearInterval(t);
     }, []);
     return (
-        <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5 h-8">
-            <Calendar className="h-3.5 w-3.5 text-medical-accent" />
+        <div className="flex items-center gap-2 bg-blue-50 border border-[#00B5AE] rounded-lg px-3 py-1.5 h-10">
+            <Calendar className="h-3.5 w-3.5 text-[#00B5AE]" />
             <div>
                 <div className="text-xs font-semibold text-medical-blue leading-tight">
                     {now.toLocaleDateString("en-US", {
@@ -42,7 +42,7 @@ const DateTime = () => {
                         day: "numeric",
                     })}
                 </div>
-                <div className="text-[10px] font-mono text-medical-accent leading-tight">
+                <div className="text-[10px] font-mono text-[#00B5AE] leading-tight">
                     {now.toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -177,7 +177,7 @@ const LaboratoryReceipt = () => {
 
     return (
         <div className="min-h-screen bg-medical-bg-app p-4">
-            <div className="max-w-[1400px] mx-auto space-y-4">
+            <div className="max-w-350 mx-auto space-y-4">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
                     {/* ═══════ LEFT COLUMN (8 cols) ═══════ */}
@@ -334,7 +334,7 @@ const LaboratoryReceipt = () => {
 
                                 {error && (
                                     <div className="bg-red-50 border border-red-200 text-red-600 px-3 py-1.5 rounded-md text-xs mt-2 flex items-center gap-1.5">
-                                        <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+                                        <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                                         {error}
                                     </div>
                                 )}
@@ -346,7 +346,10 @@ const LaboratoryReceipt = () => {
                             <CardHeader className="bg-slate-50/50 border-b border-medical-border py-3 px-5">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-sm font-bold text-medical-blue flex items-center gap-1.5">
-                                        <FlaskConical className="h-4 w-4 text-medical-accent" />
+                                        <div className="w-12 h-12 rounded-lg bg-[#B2EBE9]  flex items-center justify-center">
+
+                                            <FlaskConical className="h-5 w-5 text-[#00B5AE] " />
+                                        </div>
                                         Lab Tests <span className="text-red-500">*</span>
                                     </CardTitle>
                                     <span className="text-xs text-slate-500 font-medium">
@@ -500,7 +503,7 @@ const LaboratoryReceipt = () => {
                                 ))}
                             </div>
 
-                            <CardContent className="p-4 h-[400px] overflow-hidden">
+                            <CardContent className="p-4 h-100 overflow-hidden">
                                 {rightTab === "company" && (
                                     <div className="h-full flex flex-col">
                                         <div className="relative mb-2">

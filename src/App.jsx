@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import LinkTest from "./LinkTest.jsx";
+import Sidebar from "./components/layout/Sidebar.jsx";
+import Home from "./Pages/Home.jsx";
 import LabTestsTypes from "./Pages/Laboratory/LabTestTypes.jsx";
 import LabTestsCategories from "./Pages/Laboratory/LabTestCat.jsx";
 import LabTestsSpecimens from "./Pages/Laboratory/LabTestSpecimens.jsx";
@@ -9,22 +10,67 @@ import LabReportingFormats from "./Pages/Laboratory/LabReportingFormats.jsx";
 import LabTests from "./Pages/Laboratory/LabTests.jsx";
 import LaboratoryReceipt from "./Pages/Laboratory/LaboratoryReceipt.jsx";
 
-function App() {
-
+// Layout component that includes the sidebar
+const Layout = ({ children }) => {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<LinkTest />} />
-        <Route path="/labTestType" element={<LabTestsTypes />} />
-        <Route path="/labTestCat" element={<LabTestsCategories />} />
-        <Route path="/labTestSpecimens" element={<LabTestsSpecimens />} />
-        <Route path="/labTestsAttributes" element={<LabTestsAttributes />} />
-        <Route path="/labTestsAttributesGroup" element={<LabTestsAttributesGroups />} />
-        <Route path="/labReportingFormats" element={<LabReportingFormats />} />
-        <Route path="/labTests" element={<LabTests />} />
-        <Route path="/labReceipt" element={<LaboratoryReceipt />} />
-      </Routes>
-    </>
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar />
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={
+        <Layout>
+          <Home />
+        </Layout>
+      } />
+      <Route path="/labTestType" element={
+        <Layout>
+          <LabTestsTypes />
+        </Layout>
+      } />
+      <Route path="/labTestCat" element={
+        <Layout>
+          <LabTestsCategories />
+        </Layout>
+      } />
+      <Route path="/labTestSpecimens" element={
+        <Layout>
+          <LabTestsSpecimens />
+        </Layout>
+      } />
+      <Route path="/labTestsAttributes" element={
+        <Layout>
+          <LabTestsAttributes />
+        </Layout>
+      } />
+      <Route path="/labTestsAttributesGroup" element={
+        <Layout>
+          <LabTestsAttributesGroups />
+        </Layout>
+      } />
+      <Route path="/labReportingFormats" element={
+        <Layout>
+          <LabReportingFormats />
+        </Layout>
+      } />
+      <Route path="/labTests" element={
+        <Layout>
+          <LabTests />
+        </Layout>
+      } />
+      <Route path="/labReceipt" element={
+        <Layout>
+          <LaboratoryReceipt />
+        </Layout>
+      } />
+    </Routes>
   );
 }
 

@@ -88,7 +88,7 @@ const LabTests = () => {
 
     return (
         <div className="min-h-screen bg-medical-bg-app p-4">
-            <div className="max-w-[1400px] mx-auto space-y-4">
+            <div className="max-w-350 mx-auto space-y-4">
 
                 {/* ── Header Card with Modern Tabs ── */}
                 <Card className="border-medical-border shadow-soft overflow-hidden border-l-4 border-l-[#00B5AE]">
@@ -96,7 +96,10 @@ const LabTests = () => {
                     {/* Original Header - Kept exactly as you had it */}
                     <CardHeader className="pb-2 pt-5 px-5">
                         <div className="flex items-center gap-2">
-                            <FlaskConical className="h-5 w-5 text-medical-accent" />
+                            <div className="w-12 h-12 rounded-lg bg-[#B2EBE9]  flex items-center justify-center">
+                            
+                                          <FlaskConical className="h-5 w-5 text-[#00B5AE] " />
+                                          </div>
                             <div>
                                 <h1 className="text-lg font-bold text-medical-blue tracking-tight">LAB TESTS</h1>
                                 <p className="text-[11px] text-slate-500 mt-0.5">Manage laboratory test catalogue</p>
@@ -153,20 +156,20 @@ const LabTests = () => {
                                             "relative flex items-center gap-2 px-4 py-2.5 text-xs font-semibold transition-all duration-200",
                                             "hover:text-medical-accent group",
                                             isActive 
-                                                ? "text-medical-accent" 
+                                                ? "text-[#00B5AE]" 
                                                 : "text-slate-500 hover:text-slate-700"
                                         )}
                                     >
                                         {/* Active indicator line */}
                                         {isActive && (
-                                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-medical-accent rounded-t-full" />
+                                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00B5AE] rounded-t-full" />
                                         )}
                                         
                                         {/* Icon with hover effect */}
                                         <div className={cn(
                                             "p-1 rounded-lg transition-all duration-200",
                                             isActive 
-                                                ? "bg-blue-100 text-medical-accent" 
+                                                ? "bg-blue-100 text-[#00B5AE]" 
                                                 : "bg-transparent text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600"
                                         )}>
                                             <Icon className="h-3.5 w-3.5" />
@@ -321,7 +324,7 @@ const LabTests = () => {
                             </div>
 
                             {/* Rows */}
-                            <div className="divide-y divide-blue-50 max-h-[420px] overflow-y-auto">
+                            <div className="divide-y divide-blue-50 max-h-105 overflow-y-auto">
                                 {filtered.length === 0 ? (
                                     <div className="text-center py-10 text-slate-400 text-xs italic">No tests found.</div>
                                 ) : filtered.map(test => (

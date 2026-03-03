@@ -35,12 +35,10 @@ const LabTestsTypes = () => {
     }
   };
 
-  const handleModify = () => {
-    if (selectedIds.length === 1) {
-      const selected = labTests.find((t) => t.id === selectedIds[0]);
-      setEditingId(selectedIds[0]);
-      setEditValue(selected.typeName);
-    }
+  const handleModify = (id) => {
+    const selected = labTests.find((t) => t.id === id);
+    setEditingId(id);
+    setEditValue(selected.typeName);
   };
 
   const handleSaveEdit = () => {
@@ -57,11 +55,10 @@ const LabTestsTypes = () => {
     setEditValue("");
   };
 
-  const handleDelete = () => {
-    if (selectedIds.length > 0) {
-      setLabTests(labTests.filter((t) => !selectedIds.includes(t.id)));
-      setSelectedIds([]);
-    }
+  const handleDelete = (id) => {
+    setLabTests(labTests.filter((t) => t.id !== id));
+    // Remove from selectedIds if present
+    setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
   };
 
   const toggleSelection = (id) =>
@@ -73,26 +70,60 @@ const LabTestsTypes = () => {
     setSelectedIds(selectedIds.length === labTests.length ? [] : labTests.map((t) => t.id));
 
   return (
-    <div className="min-h-screen bg-medical-bg-app p-4">
-      <div className="max-w-3xl mx-auto space-y-4">
-        {/* ── Main Table Card ── */}
-        <Card className="border-medical-border shadow-soft overflow-hidden border-l-4 border-l-[#00B5AE]">
-           <CardHeader className="pb-3 pt-5 px-5">
+    <div className="min-h-screen bg-gradient-to-br to-blue-50 p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <Card className="border-medical-border overflow-hidden border-l-4 border-l-[#00B5AE] bg-white rounded-xl sm:rounded-2xl shadow-lg p-6  sm:border-l-8">
+          <CardHeader className="pb-3 pt-5 px-5">
             <div className="flex items-center gap-2">
-              <FlaskConical className="h-5 w-5 text-medical-accent" />
+              <div className="w-12 h-12 rounded-lg bg-[#B2EBE9]  flex items-center justify-center">
+
+                <FlaskConical className="h-5 w-5 text-[#00B5AE] " />
+              </div>
               <div>
                 <h1 className="text-lg font-bold text-medical-blue tracking-tight">LAB TEST TYPES</h1>
                 <p className="text-[11px] text-slate-500 mt-0.5">Manage laboratory test type categories</p>
               </div>
             </div>
           </CardHeader>
+          <CardContent className="p-4 space-y-4">
+
+            {/* Add new entry */}
+            <div>
+              <Label className="text-[11px] text-slate-500 mb-1 block">
+                New Type Name
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter lab test type name..."
+                  value={newTypeName}
+                  onChange={(e) => setNewTypeName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSave()}
+                  className="h-8 flex-1 w-full px-3 py-2 pl-10 border rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B9B3] focus:border-[#00B9B3] transition-all duration-200  "
+                />
+                <Button
+                  onClick={handleSave}
+                  disabled={!newTypeName.trim()}
+                  className="h-8 text-xs bg-medical-accent hover:bg-blue-600 text-white px-4"
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Add
+                </Button>
+              </div>
+            </div>
+
+
+
+          </CardContent>
+        </Card>
+        {/* ── Main Table Card ── */}
+        <Card className="border-medical-border shadow-soft overflow-hidden ">
+
 
           <CardContent className="p-4 space-y-4">
 
             {/* Table */}
             <div className="border-2 border-blue-100 rounded-lg overflow-hidden">
               {/* Header row */}
-              <div className="grid grid-cols-[40px_60px_1fr] bg-slate-50/80 border-b border-blue-100 px-3 py-2">
+              <div className="grid grid-cols-[40px_60px_1fr_80px] bg-slate-50/80 border-b border-blue-100 px-3 py-2">
                 <div className="flex items-center">
                   <Checkbox
                     checked={selectedIds.length === labTests.length && labTests.length > 0}
@@ -102,6 +133,7 @@ const LabTestsTypes = () => {
                 </div>
                 <span className="text-[11px] font-bold text-medical-blue flex items-center">Sr.#</span>
                 <span className="text-[11px] font-bold text-medical-blue flex items-center">Lab Type</span>
+                <span className="text-[11px] font-bold text-medical-blue flex items-center">Actions</span>
               </div>
 
               {/* Rows */}
@@ -115,7 +147,7 @@ const LabTestsTypes = () => {
                     <div
                       key={test.id}
                       className={cn(
-                        "grid grid-cols-[40px_60px_1fr] px-3 py-2.5 transition-colors",
+                        "grid grid-cols-[40px_60px_1fr_80px] px-3 py-2.5 transition-colors",
                         selectedIds.includes(test.id) ? "bg-blue-50" : "hover:bg-slate-50/80"
                       )}
                     >
@@ -157,6 +189,28 @@ const LabTestsTypes = () => {
                           <span className="text-xs font-medium text-slate-800">{test.typeName}</span>
                         )}
                       </div>
+
+                      {/* Actions Column with always active buttons */}
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleModify(test.id)}
+                          className="h-7 w-7 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                          title="Edit"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(test.id)}
+                          className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   ))
                 )}
@@ -169,81 +223,6 @@ const LabTestsTypes = () => {
                 {selectedIds.length} item{selectedIds.length > 1 ? "s" : ""} selected
               </p>
             )}
-
-            <Separator />
-
-            {/* Add new entry */}
-            <div>
-              <Label className="text-[11px] text-slate-500 mb-1 block">
-                New Type Name
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter lab test type name..."
-                  value={newTypeName}
-                  onChange={(e) => setNewTypeName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSave()}
-                  className="h-8 text-xs border-medical-border flex-1"
-                />
-                <Button
-                  onClick={handleSave}
-                  disabled={!newTypeName.trim()}
-                  className="h-8 text-xs bg-medical-accent hover:bg-blue-600 text-white px-4"
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1" /> Add
-                </Button>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Action buttons */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleNew}
-                  className="h-8 text-xs border-medical-border text-slate-600 hover:bg-slate-50"
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1" /> New
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSave}
-                  disabled={!newTypeName.trim()}
-                  className="h-8 text-xs border-medical-border text-slate-600 hover:bg-slate-50"
-                >
-                  <Save className="h-3.5 w-3.5 mr-1" /> Save
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleModify}
-                  disabled={selectedIds.length !== 1}
-                  className="h-8 text-xs border-medical-border text-slate-600 hover:bg-slate-50"
-                >
-                  <Pencil className="h-3.5 w-3.5 mr-1" /> Modify
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDelete}
-                  disabled={selectedIds.length === 0}
-                  className="h-8 text-xs border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700"
-                >
-                  <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
-                </Button>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 text-xs border-medical-border text-slate-500 hover:bg-slate-50"
-              >
-                <X className="h-3.5 w-3.5 mr-1" /> Exit
-              </Button>
-            </div>
 
           </CardContent>
         </Card>

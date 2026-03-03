@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Save, Pencil, Trash2, X, FlaskConical, Search } from "lucide-react";
+import { Save, Pencil, Trash2, X, FlaskConical, Search, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const LabTestsAttributes = () => {
@@ -23,6 +23,13 @@ const LabTestsAttributes = () => {
     { id: 11, srNo: 11, attribute: "Adult Female", unit: "-", normalRange: "-" },
   ]);
 
+  // New attribute input fields
+  const [newAttribute, setNewAttribute] = useState({
+    attribute: "",
+    unit: "",
+    normalRange: ""
+  });
+
   const [selectedIds, setSelectedIds] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editValues, setEditValues] = useState({ attribute: "", unit: "", normalRange: "" });
@@ -34,23 +41,49 @@ const LabTestsAttributes = () => {
     normalRange: "Negative: < 0.9 | Borderline: 0.9 to 1.1 | Positive: > 1.1"
   });
 
-  const handleModify = () => {
-    if (selectedIds.length === 1) {
-      const a = attributes.find(x => x.id === selectedIds[0]);
-      setEditingId(a.id);
-      setEditValues({ attribute: a.attribute, unit: a.unit, normalRange: a.normalRange });
+  const handleNew = () => {
+    setNewAttribute({ attribute: "", unit: "", normalRange: "" });
+  };
+
+  const handleSaveNew = () => {
+    if (newAttribute.attribute.trim()) {
+      const newId = Math.max(...attributes.map(a => a.id), 0) + 1;
+      setAttributes([
+        ...attributes,
+        {
+          id: newId,
+          srNo: attributes.length + 1,
+          attribute: newAttribute.attribute.trim(),
+          unit: newAttribute.unit.trim() || "-",
+          normalRange: newAttribute.normalRange.trim() || "-"
+        }
+      ]);
+      setNewAttribute({ attribute: "", unit: "", normalRange: "" });
     }
+  };
+
+  const handleModify = (id) => {
+    const attribute = attributes.find(x => x.id === id);
+    setEditingId(attribute.id);
+    setEditValues({
+      attribute: attribute.attribute,
+      unit: attribute.unit,
+      normalRange: attribute.normalRange
+    });
   };
 
   const handleSaveEdit = () => {
     if (editingId) {
       setAttributes(attributes.map(a => a.id === editingId ? { ...a, ...editValues } : a));
-      setEditingId(null); setEditValues({ attribute: "", unit: "", normalRange: "" }); setSelectedIds([]);
+      setEditingId(null);
+      setEditValues({ attribute: "", unit: "", normalRange: "" });
+      setSelectedIds([]);
     }
   };
 
-  const handleDelete = () => {
-    if (selectedIds.length > 0) { setAttributes(attributes.filter(a => !selectedIds.includes(a.id))); setSelectedIds([]); }
+  const handleDelete = (id) => {
+    setAttributes(attributes.filter(a => a.id !== id));
+    setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
   };
 
   const toggleSelection = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -65,111 +98,210 @@ const LabTestsAttributes = () => {
     <div className="min-h-screen bg-medical-bg-app p-4">
       <div className="max-w-5xl mx-auto space-y-4">
 
-        {/* Selected Attribute Info Card */}
+
+
+        {/* Main Table Card */}
         <Card className="border-medical-border shadow-soft overflow-hidden border-l-4 border-l-[#00B5AE]">
           <CardHeader className="pb-3 pt-5 px-5">
             <div className="flex items-center gap-2">
-              <FlaskConical className="h-5 w-5 text-medical-accent" />
+              <div className="w-12 h-12 rounded-lg bg-[#B2EBE9]  flex items-center justify-center">
+              
+                            <FlaskConical className="h-5 w-5 text-[#00B5AE] " />
+                            </div>
               <div>
                 <h1 className="text-lg font-bold text-medical-blue tracking-tight">LAB TEST ATTRIBUTES</h1>
                 <p className="text-[11px] text-slate-500 mt-0.5">Manage attributes, units and normal ranges</p>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="px-5 py-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label className="text-[11px] text-slate-500 mb-0.5 block">Test Attribute</Label>
-                <p className="text-xs font-semibold text-slate-800">{testAttribute.name}</p>
-              </div>
-              <div>
-                <Label className="text-[11px] text-slate-500 mb-0.5 block">Unit</Label>
-                <p className="text-xs font-semibold text-slate-800">{testAttribute.unit}</p>
-              </div>
-              <div>
-                <Label className="text-[11px] text-slate-500 mb-0.5 block">Normal Range</Label>
-                <p className="text-xs font-semibold text-slate-800">{testAttribute.normalRange}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Main Table Card */}
-        <Card className="border-medical-border shadow-soft overflow-hidden">
-          <CardHeader className="bg-slate-50/50 border-b border-medical-border py-3 px-5">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-bold text-medical-blue">Attributes List</CardTitle>
-              <span className="text-xs text-slate-500 font-medium">{attributes.length} attribute{attributes.length !== 1 ? "s" : ""}</span>
-            </div>
-          </CardHeader>
           <CardContent className="p-4 space-y-4">
+
+            {/* New Attribute Input Fields */}
+            <div className="bg-blue-50/30 p-4 rounded-lg border border-blue-100">
+              <Label className="text-[11px] text-slate-500 mb-2 block font-semibold">Add New Attribute</Label>
+              <div className="grid grid-cols-3 gap-3 mb-3">
+                <div>
+                  <Input
+                    placeholder="Attribute name *"
+                    value={newAttribute.attribute}
+                    onChange={e => setNewAttribute(p => ({ ...p, attribute: e.target.value }))}
+                    className="h-8 text-xs border-medical-border"
+                  />
+                </div>
+                <div>
+                  <Input
+                    placeholder="Unit (e.g., IU/mL)"
+                    value={newAttribute.unit}
+                    onChange={e => setNewAttribute(p => ({ ...p, unit: e.target.value }))}
+                    className="h-8 text-xs border-medical-border"
+                  />
+                </div>
+                <div>
+                  <Input
+                    placeholder="Normal range (optional)"
+                    value={newAttribute.normalRange}
+                    onChange={e => setNewAttribute(p => ({ ...p, normalRange: e.target.value }))}
+                    onKeyDown={e => e.key === "Enter" && handleSaveNew()}
+                    className="h-8 text-xs border-medical-border"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleNew}
+                  className="h-8 text-xs border-medical-border text-slate-600 hover:bg-slate-50"
+                >
+                  <X className="h-3.5 w-3.5 mr-1" /> Clear
+                </Button>
+                <Button
+                  onClick={handleSaveNew}
+                  disabled={!newAttribute.attribute.trim()}
+                  className="h-8 text-xs bg-medical-accent hover:bg-blue-600 text-white px-4"
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Add Attribute
+                </Button>
+              </div>
+            </div>
 
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
-              <Input placeholder="Search attributes..." className="pl-9 h-8 text-xs border-medical-border" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+              <Input
+                placeholder="Search attributes..."
+                className="pl-9 h-8 text-xs border-medical-border"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
             </div>
 
             <div className="border-2 border-blue-100 rounded-lg overflow-hidden">
-              {/* Header */}
-              <div className="grid grid-cols-[40px_50px_2fr_80px_2fr] bg-slate-50/80 border-b border-blue-100 px-3 py-2">
+              {/* Header with Actions column */}
+              <div className="grid grid-cols-[40px_50px_2fr_80px_2fr_80px] bg-slate-50/80 border-b border-blue-100 px-3 py-2">
                 <div className="flex items-center">
-                  <Checkbox checked={selectedIds.length === attributes.length && attributes.length > 0} onCheckedChange={toggleSelectAll} className="h-3.5 w-3.5" />
+                  <Checkbox
+                    checked={selectedIds.length === filtered.length && filtered.length > 0}
+                    onCheckedChange={toggleSelectAll}
+                    className="h-3.5 w-3.5"
+                  />
                 </div>
                 <span className="text-[11px] font-bold text-medical-blue flex items-center">Sr.#</span>
                 <span className="text-[11px] font-bold text-medical-blue flex items-center">Attribute</span>
                 <span className="text-[11px] font-bold text-medical-blue flex items-center">Unit</span>
                 <span className="text-[11px] font-bold text-medical-blue flex items-center">Normal Range</span>
+                <span className="text-[11px] font-bold text-medical-blue flex items-center">Actions</span>
               </div>
+
+              {/* Rows with Actions column */}
               <div className="divide-y divide-blue-50 max-h-80 overflow-y-auto">
                 {filtered.length === 0 ? (
                   <div className="text-center py-10 text-slate-400 text-xs italic">No attributes found.</div>
                 ) : filtered.map(attr => (
-                  <div key={attr.id} className={cn("grid grid-cols-[40px_50px_2fr_80px_2fr] px-3 py-2.5 transition-colors", selectedIds.includes(attr.id) ? "bg-blue-50" : "hover:bg-slate-50/80")}>
+                  <div
+                    key={attr.id}
+                    className={cn(
+                      "grid grid-cols-[40px_50px_2fr_80px_2fr_80px] px-3 py-2.5 transition-colors",
+                      selectedIds.includes(attr.id) ? "bg-blue-50" : "hover:bg-slate-50/80"
+                    )}
+                  >
                     <div className="flex items-center">
-                      <Checkbox checked={selectedIds.includes(attr.id)} onCheckedChange={() => toggleSelection(attr.id)} className="h-3.5 w-3.5" />
+                      <Checkbox
+                        checked={selectedIds.includes(attr.id)}
+                        onCheckedChange={() => toggleSelection(attr.id)}
+                        className="h-3.5 w-3.5"
+                      />
                     </div>
                     <span className="text-xs text-slate-500 flex items-center">{attr.srNo}</span>
+
+                    {/* Attribute column */}
                     <div className="flex items-center pr-2">
                       {editingId === attr.id ? (
-                        <Input value={editValues.attribute} onChange={e => setEditValues(p => ({ ...p, attribute: e.target.value }))} className="h-7 text-xs border-medical-border w-full" />
+                        <Input
+                          value={editValues.attribute}
+                          onChange={e => setEditValues(p => ({ ...p, attribute: e.target.value }))}
+                          className="h-7 text-xs border-medical-border w-full"
+                          autoFocus
+                        />
                       ) : (
                         <span className="text-xs font-medium text-slate-800 truncate">{attr.attribute}</span>
                       )}
                     </div>
+
+                    {/* Unit column */}
                     <div className="flex items-center pr-2">
                       {editingId === attr.id ? (
-                        <Input value={editValues.unit} onChange={e => setEditValues(p => ({ ...p, unit: e.target.value }))} className="h-7 text-xs border-medical-border w-full" />
+                        <Input
+                          value={editValues.unit}
+                          onChange={e => setEditValues(p => ({ ...p, unit: e.target.value }))}
+                          className="h-7 text-xs border-medical-border w-full"
+                        />
                       ) : (
                         <span className="text-xs text-slate-600">{attr.unit}</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+
+                    {/* Normal Range column with edit mode */}
+                    <div className="flex items-center gap-1">
                       {editingId === attr.id ? (
-                        <>
-                          <Input value={editValues.normalRange} onChange={e => setEditValues(p => ({ ...p, normalRange: e.target.value }))} className="h-7 text-xs border-medical-border flex-1" />
-                          <Button size="sm" onClick={handleSaveEdit} className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"><Save className="h-3 w-3" /></Button>
-                          <Button size="sm" variant="outline" onClick={() => setEditingId(null)} className="h-7 px-2 text-xs border-medical-border"><X className="h-3 w-3" /></Button>
-                        </>
+                        <div className="flex items-center gap-1 w-full">
+                          <Input
+                            value={editValues.normalRange}
+                            onChange={e => setEditValues(p => ({ ...p, normalRange: e.target.value }))}
+                            onKeyDown={e => e.key === "Enter" && handleSaveEdit()}
+                            className="h-7 text-xs border-medical-border flex-1"
+                          />
+                          <Button
+                            size="sm"
+                            onClick={handleSaveEdit}
+                            className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            <Save className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingId(null)}
+                            className="h-7 px-2 text-xs border-medical-border"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
                       ) : (
                         <span className="text-xs text-slate-600 truncate">{attr.normalRange}</span>
                       )}
+                    </div>
+
+                    {/* Actions Column with always active buttons */}
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleModify(attr.id)}
+                        className="h-7 w-7 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                        title="Edit"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(attr.id)}
+                        className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {selectedIds.length > 0 && <p className="text-[11px] text-medical-accent font-medium">{selectedIds.length} item{selectedIds.length > 1 ? "s" : ""} selected</p>}
-
-            <Separator />
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleModify} disabled={selectedIds.length !== 1} className="h-8 text-xs border-medical-border text-slate-600 hover:bg-slate-50"><Pencil className="h-3.5 w-3.5 mr-1" /> Modify</Button>
-                <Button variant="outline" size="sm" onClick={handleDelete} disabled={selectedIds.length === 0} className="h-8 text-xs border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700"><Trash2 className="h-3.5 w-3.5 mr-1" /> Delete</Button>
-              </div>
-              <Button variant="outline" size="sm" className="h-8 text-xs border-medical-border text-slate-500 hover:bg-slate-50"><X className="h-3.5 w-3.5 mr-1" /> Exit</Button>
-            </div>
+            {selectedIds.length > 0 && (
+              <p className="text-[11px] text-medical-accent font-medium">
+                {selectedIds.length} item{selectedIds.length > 1 ? "s" : ""} selected
+              </p>
+            )}
 
           </CardContent>
         </Card>
