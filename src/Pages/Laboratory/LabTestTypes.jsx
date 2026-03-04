@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -16,15 +15,8 @@ const LabTestsTypes = () => {
   ]);
 
   const [newTypeName, setNewTypeName] = useState("");
-  const [selectedIds, setSelectedIds] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editValue, setEditValue] = useState("");
-
-  const handleNew = () => {
-    setNewTypeName("");
-    setEditingId(null);
-    setSelectedIds([]);
-  };
 
   const handleSave = () => {
     if (newTypeName.trim()) {
@@ -46,7 +38,6 @@ const LabTestsTypes = () => {
       setLabTests(labTests.map((t) => (t.id === editingId ? { ...t, typeName: editValue.trim() } : t)));
       setEditingId(null);
       setEditValue("");
-      setSelectedIds([]);
     }
   };
 
@@ -56,28 +47,24 @@ const LabTestsTypes = () => {
   };
 
   const handleDelete = (id) => {
-    setLabTests(labTests.filter((t) => t.id !== id));
-    // Remove from selectedIds if present
-    setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+    // Filter out the deleted item
+    const filteredTests = labTests.filter((t) => t.id !== id);
+    // Update sr numbers sequentially
+    const updatedTests = filteredTests.map((test, index) => ({
+      ...test,
+      srNo: index + 1
+    }));
+    setLabTests(updatedTests);
   };
-
-  const toggleSelection = (id) =>
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-
-  const toggleSelectAll = () =>
-    setSelectedIds(selectedIds.length === labTests.length ? [] : labTests.map((t) => t.id));
 
   return (
     <div className="min-h-screen bg-gradient-to-br to-blue-50 p-4 md:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
-        <Card className="border-medical-border overflow-hidden border-l-4 border-l-[#00B5AE] bg-white rounded-xl sm:rounded-2xl shadow-lg p-6  sm:border-l-8">
+        <Card className="border-medical-border overflow-hidden border-l-4 border-l-[#00B5AE] bg-white rounded-xl sm:rounded-2xl shadow-lg p-6 sm:border-l-8">
           <CardHeader className="pb-3 pt-5 px-5">
             <div className="flex items-center gap-2">
-              <div className="w-12 h-12 rounded-lg bg-[#B2EBE9]  flex items-center justify-center">
-
-                <FlaskConical className="h-5 w-5 text-[#00B5AE] " />
+              <div className="w-12 h-12 rounded-lg bg-[#B2EBE9] flex items-center justify-center">
+                <FlaskConical className="h-5 w-5 text-[#00B5AE]" />
               </div>
               <div>
                 <h1 className="text-lg font-bold text-medical-blue tracking-tight">LAB TEST TYPES</h1>
@@ -86,7 +73,6 @@ const LabTestsTypes = () => {
             </div>
           </CardHeader>
           <CardContent className="p-4 space-y-4">
-
             {/* Add new entry */}
             <div>
               <Label className="text-[11px] text-slate-500 mb-1 block">
@@ -98,45 +84,33 @@ const LabTestsTypes = () => {
                   value={newTypeName}
                   onChange={(e) => setNewTypeName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSave()}
-                  className="h-8 flex-1 w-full px-3 py-2 pl-10 border rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B9B3] focus:border-[#00B9B3] transition-all duration-200  "
+                  className="h-8 flex-1 w-full px-3 py-2 pl-10 border rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#00B9B3] focus:border-[#00B9B3] transition-all duration-200"
                 />
                 <Button
                   onClick={handleSave}
                   disabled={!newTypeName.trim()}
-                  className="h-8 text-xs bg-medical-accent hover:bg-blue-600 text-white px-4"
+                  variant="default"
                 >
                   <Plus className="h-3.5 w-3.5 mr-1" /> Add
                 </Button>
               </div>
             </div>
-
-
-
           </CardContent>
         </Card>
+
         {/* ── Main Table Card ── */}
-        <Card className="border-medical-border shadow-soft overflow-hidden ">
-
-
+        <Card className="border-medical-border shadow-soft overflow-hidden">
           <CardContent className="p-4 space-y-4">
-
             {/* Table */}
             <div className="border-2 border-blue-100 rounded-lg overflow-hidden">
-              {/* Header row */}
-              <div className="grid grid-cols-[40px_60px_1fr_80px] bg-slate-50/80 border-b border-blue-100 px-3 py-2">
-                <div className="flex items-center">
-                  <Checkbox
-                    checked={selectedIds.length === labTests.length && labTests.length > 0}
-                    onCheckedChange={toggleSelectAll}
-                    className="h-3.5 w-3.5"
-                  />
-                </div>
+              {/* Header row - Removed checkbox column */}
+              <div className="grid grid-cols-[60px_1fr_80px] bg-slate-50/80 border-b border-blue-100 px-3 py-2">
                 <span className="text-[11px] font-bold text-medical-blue flex items-center">Sr.#</span>
                 <span className="text-[11px] font-bold text-medical-blue flex items-center">Lab Type</span>
                 <span className="text-[11px] font-bold text-medical-blue flex items-center">Actions</span>
               </div>
 
-              {/* Rows */}
+              {/* Rows - Removed checkbox column */}
               <div className="divide-y divide-blue-50 max-h-72 overflow-y-auto">
                 {labTests.length === 0 ? (
                   <div className="text-center py-10 text-slate-400 text-xs italic">
@@ -147,21 +121,14 @@ const LabTestsTypes = () => {
                     <div
                       key={test.id}
                       className={cn(
-                        "grid grid-cols-[40px_60px_1fr_80px] px-3 py-2.5 transition-colors",
-                        selectedIds.includes(test.id) ? "bg-blue-50" : "hover:bg-slate-50/80"
+                        "grid grid-cols-[60px_1fr_80px] px-3 py-2.5 transition-colors hover:bg-slate-50/80"
                       )}
                     >
-                      <div className="flex items-center">
-                        <Checkbox
-                          checked={selectedIds.includes(test.id)}
-                          onCheckedChange={() => toggleSelection(test.id)}
-                          className="h-3.5 w-3.5"
-                        />
-                      </div>
                       <span className="text-xs text-slate-500 flex items-center">{test.srNo}</span>
+                      
                       <div className="flex items-center">
                         {editingId === test.id ? (
-                          <div className="flex items-center gap-2 w-full">
+                          <div className="flex items-center gap-2 w-full max-w-md">
                             <Input
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
@@ -190,7 +157,7 @@ const LabTestsTypes = () => {
                         )}
                       </div>
 
-                      {/* Actions Column with always active buttons */}
+                      {/* Actions Column */}
                       <div className="flex items-center gap-1">
                         <Button
                           variant="ghost"
@@ -205,7 +172,7 @@ const LabTestsTypes = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDelete(test.id)}
-                          className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:!bg-red-100"
                           title="Delete"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -217,13 +184,7 @@ const LabTestsTypes = () => {
               </div>
             </div>
 
-            {/* Selection info */}
-            {selectedIds.length > 0 && (
-              <p className="text-[11px] text-medical-accent font-medium">
-                {selectedIds.length} item{selectedIds.length > 1 ? "s" : ""} selected
-              </p>
-            )}
-
+            {/* Removed selection info section */}
           </CardContent>
         </Card>
       </div>

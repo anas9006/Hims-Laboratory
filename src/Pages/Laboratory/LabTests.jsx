@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Pencil, Trash2, X, FlaskConical, Search, FileText, Settings, Package } from "lucide-react";
+import { Plus, Save, Pencil, Trash2, X, FlaskConical, Search, FileText, Settings, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const LabTests = () => {
@@ -24,11 +24,26 @@ const LabTests = () => {
     const [amount, setAmount] = useState("");
     const [specimenRequired, setSpecimenRequired] = useState("");
     const [reportingFormat, setReportingFormat] = useState("");
+    
+    // New state variables for additional fields in Test Details
+    const [testPerformedOn, setTestPerformedOn] = useState("");
+    const [resultAfterHours, setResultAfterHours] = useState("");
+    const [reportPages, setReportPages] = useState("");
+    const [testReportOn, setTestReportOn] = useState("");
 
     // ── Attributes tab state ──
     const [attrName, setAttrName] = useState("");
     const [attrUnit, setAttrUnit] = useState("");
     const [attrNormalRange, setAttrNormalRange] = useState("");
+    
+    // New state variables for additional fields in Attributes tab
+    const [testGroup, setTestGroup] = useState("");
+    const [testAttribute, setTestAttribute] = useState("");
+    const [displayOrder, setDisplayOrder] = useState("");
+    const [normalRangeDisplay, setNormalRangeDisplay] = useState("");
+    const [minValue, setMinValue] = useState("");
+    const [maxValue, setMaxValue] = useState("");
+    const [genderAttribute, setGenderAttribute] = useState("both");
 
     // ── Inventory Details tab state ──
     const [inventoryItem, setInventoryItem] = useState("");
@@ -55,12 +70,6 @@ const LabTests = () => {
         { id: 17, sr: 17, type: "SPECIAL TESTS", category: "", code: "188", test: "ACTH", amount: "3,250", result: "" },
     ]);
 
-    const [selectedIds, setSelectedIds] = useState([]);
-
-    const toggleSelection = (id) => setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-    const toggleSelectAll = () => setSelectedIds(selectedIds.length === tests.length ? [] : tests.map(t => t.id));
-    const handleDelete = () => { if (selectedIds.length > 0) { setTests(tests.filter(t => !selectedIds.includes(t.id))); setSelectedIds([]); } };
-
     const filtered = tests.filter(t =>
         t.test.toLowerCase().includes(searchTerm.toLowerCase()) ||
         t.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -69,19 +78,19 @@ const LabTests = () => {
 
     // Modern tabs configuration with icons
     const TABS = [
-        { 
-            id: "details", 
-            label: "Test Details", 
+        {
+            id: "details",
+            label: "Test Details",
             icon: FileText,
         },
-        { 
-            id: "attributes", 
-            label: "Attributes", 
+        {
+            id: "attributes",
+            label: "Attributes",
             icon: Settings,
         },
-        { 
-            id: "inventory", 
-            label: "Inventory Details", 
+        {
+            id: "inventory",
+            label: "Inventory Details",
             icon: Package,
         },
     ];
@@ -93,21 +102,20 @@ const LabTests = () => {
                 {/* ── Header Card with Modern Tabs ── */}
                 <Card className="border-medical-border shadow-soft overflow-hidden border-l-4 border-l-[#00B5AE]">
 
-                    {/* Original Header - Kept exactly as you had it */}
+                    {/* Original Header */}
                     <CardHeader className="pb-2 pt-5 px-5">
                         <div className="flex items-center gap-2">
                             <div className="w-12 h-12 rounded-lg bg-[#B2EBE9]  flex items-center justify-center">
-                            
-                                          <FlaskConical className="h-5 w-5 text-[#00B5AE] " />
-                                          </div>
+                                <FlaskConical className="h-5 w-5 text-[#00B5AE] " />
+                            </div>
                             <div>
                                 <h1 className="text-lg font-bold text-medical-blue tracking-tight">LAB TESTS</h1>
                                 <p className="text-[11px] text-slate-500 mt-0.5">Manage laboratory test catalogue</p>
                             </div>
                         </div>
                     </CardHeader>
-                    
-                    {/* Original Test Type/Name/Amount grid - Kept exactly as you had it */}
+
+                    {/* Original Test Type/Name/Amount grid */}
                     <CardContent>
                         <div className="space-y-4">
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -141,13 +149,13 @@ const LabTests = () => {
                         </div>
                     </CardContent>
 
-                    {/* Modern Tab Navigation - Only this part is modernized */}
+                    {/* Modern Tab Navigation */}
                     <div className="border-b border-medical-border px-2 bg-white">
                         <div className="grid grid-cols-5 gap-1">
                             {TABS.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
-                                
+
                                 return (
                                     <button
                                         key={tab.id}
@@ -155,8 +163,8 @@ const LabTests = () => {
                                         className={cn(
                                             "relative flex items-center gap-2 px-4 py-2.5 text-xs font-semibold transition-all duration-200",
                                             "hover:text-medical-accent group",
-                                            isActive 
-                                                ? "text-[#00B5AE]" 
+                                            isActive
+                                                ? "text-[#00B5AE]"
                                                 : "text-slate-500 hover:text-slate-700"
                                         )}
                                     >
@@ -164,17 +172,17 @@ const LabTests = () => {
                                         {isActive && (
                                             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00B5AE] rounded-t-full" />
                                         )}
-                                        
+
                                         {/* Icon with hover effect */}
                                         <div className={cn(
                                             "p-1 rounded-lg transition-all duration-200",
-                                            isActive 
-                                                ? "bg-blue-100 text-[#00B5AE]" 
+                                            isActive
+                                                ? "bg-blue-100 text-[#00B5AE]"
                                                 : "bg-transparent text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600"
                                         )}>
                                             <Icon className="h-3.5 w-3.5" />
                                         </div>
-                                        
+
                                         {/* Label */}
                                         <span>{tab.label}</span>
                                     </button>
@@ -189,6 +197,7 @@ const LabTests = () => {
                             {/* ── TEST DETAILS TAB ── */}
                             {activeTab === "details" && (
                                 <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    {/* First row - Gender and Checkboxes */}
                                     <div className="flex items-center gap-8 flex-wrap">
                                         <div>
                                             <Label className="text-[11px] text-slate-500 mb-1 block">For Gender</Label>
@@ -213,6 +222,7 @@ const LabTests = () => {
                                         </div>
                                     </div>
 
+                                    {/* Second row - Specimen and Reporting Format */}
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                                         <div>
                                             <Label className="text-[11px] text-slate-500 mb-0.5 block">Specimen for Test</Label>
@@ -232,7 +242,7 @@ const LabTests = () => {
                                             <Label className="text-[11px] text-slate-500 mb-0.5 block">Reporting Format</Label>
                                             <Select value={reportingFormat} onValueChange={setReportingFormat}>
                                                 <SelectTrigger className="h-8 text-xs border-medical-border">
-                                                    <SelectValue placeholder="Select Format" />
+                                                    <SelectValue placeholder="Select Reporting Format" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="regular">REGULAR</SelectItem>
@@ -243,28 +253,188 @@ const LabTests = () => {
                                             </Select>
                                         </div>
                                     </div>
+
+                                    {/* Third row - Test Performed On, Result after Hours, Report Pages */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                                        <div>
+                                            <Label className="text-[11px] text-slate-500 mb-0.5 block">Test Performed on</Label>
+                                            <Select value={testPerformedOn} onValueChange={setTestPerformedOn}>
+                                                <SelectTrigger className="h-8 text-xs border-medical-border">
+                                                    <SelectValue placeholder="Select Test Performed on Days" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="daily">Daily</SelectItem>
+                                                    <SelectItem value="weekdays">Weekdays (Mon-Fri)</SelectItem>
+                                                    <SelectItem value="weekends">Weekends</SelectItem>
+                                                    <SelectItem value="monday">Monday</SelectItem>
+                                                    <SelectItem value="tuesday">Tuesday</SelectItem>
+                                                    <SelectItem value="wednesday">Wednesday</SelectItem>
+                                                    <SelectItem value="thursday">Thursday</SelectItem>
+                                                    <SelectItem value="friday">Friday</SelectItem>
+                                                    <SelectItem value="saturday">Saturday</SelectItem>
+                                                    <SelectItem value="sunday">Sunday</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div>
+                                            <Label className="text-[11px] text-slate-500 mb-0.5 block">Result after Hours</Label>
+                                            <Input 
+                                                value={resultAfterHours} 
+                                                onChange={e => setResultAfterHours(e.target.value)} 
+                                                className="h-8 text-xs border-medical-border" 
+                                                placeholder="Enter hours" 
+                                                type="number"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label className="text-[11px] text-slate-500 mb-0.5 block">Report Pages</Label>
+                                            <Input 
+                                                value={reportPages} 
+                                                onChange={e => setReportPages(e.target.value)} 
+                                                className="h-8 text-xs border-medical-border" 
+                                                placeholder="Enter number of pages" 
+                                                type="number"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Fourth row - Test Report on */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-3">
+                                        <div>
+                                            <Label className="text-[11px] text-slate-500 mb-0.5 block">Test Report on</Label>
+                                            <Select value={testReportOn} onValueChange={setTestReportOn}>
+                                                <SelectTrigger className="h-8 text-xs border-medical-border">
+                                                    <SelectValue placeholder="Report Day" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="same-day">Same Day</SelectItem>
+                                                    <SelectItem value="next-day">Next Day</SelectItem>
+                                                    <SelectItem value="within-2-days">Within 2 Days</SelectItem>
+                                                    <SelectItem value="within-3-days">Within 3 Days</SelectItem>
+                                                    <SelectItem value="within-5-days">Within 5 Days</SelectItem>
+                                                    <SelectItem value="within-7-days">Within 7 Days</SelectItem>
+                                                    <SelectItem value="within-14-days">Within 14 Days</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
 
                             {/* ── ATTRIBUTES TAB ── */}
                             {activeTab === "attributes" && (
-                                <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    {/* First row - Test Group and Test Attribute */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                                         <div>
-                                            <Label className="text-[11px] text-slate-500 mb-0.5 block">Attribute Name</Label>
-                                            <Input value={attrName} onChange={e => setAttrName(e.target.value)} className="h-8 text-xs border-medical-border" placeholder="Enter attribute name" />
+                                            <Label className="text-[11px] text-slate-500 mb-0.5 block">Test Group</Label>
+                                            <Select value={testGroup} onValueChange={setTestGroup}>
+                                                <SelectTrigger className="h-8 text-xs border-medical-border">
+                                                    <SelectValue placeholder="Select Group" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="chemical">Chemical Examination</SelectItem>
+                                                    <SelectItem value="differential">Differential Leukocytes Count</SelectItem>
+                                                    <SelectItem value="microscope">Microscope Examination</SelectItem>
+                                                    <SelectItem value="physical">Physical Examination</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                         <div>
-                                            <Label className="text-[11px] text-slate-500 mb-0.5 block">Unit</Label>
-                                            <Input value={attrUnit} onChange={e => setAttrUnit(e.target.value)} className="h-8 text-xs border-medical-border" placeholder="e.g. IU/mL, mg/dL" />
+                                            <Label className="text-[11px] text-slate-500 mb-0.5 block">Test Attribute</Label>
+                                            <Select value={testAttribute} onValueChange={setTestAttribute}>
+                                                <SelectTrigger className="h-8 text-xs border-medical-border">
+                                                    <SelectValue placeholder="Select Lab Attributes" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="hsv1-igg">HSV-1 IgG</SelectItem>
+                                                    <SelectItem value="hsv1-igm">HSV-1 IgM</SelectItem>
+                                                    <SelectItem value="hsv2-igg">HSV-2 IgG</SelectItem>
+                                                    <SelectItem value="hsv2-igm">HSV-2 IgM</SelectItem>
+                                                    <SelectItem value="17oh">17-OH Progesterone</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+
+                                    {/* Second row - Test Unit and Normal Range Display */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                        <div>
+                                            <Label className="text-[11px] text-slate-500 mb-0.5 block">Test Unit</Label>
+                                            <div className="flex items-center gap-2">
+                                                <Input 
+                                                    value={attrUnit} 
+                                                    onChange={e => setAttrUnit(e.target.value)} 
+                                                    className="h-8 text-xs border-medical-border flex-1" 
+                                                    placeholder="e.g. IU/mL, mg/dL" 
+                                                />
+                                                <span className="text-xs text-slate-500 whitespace-nowrap">Display Order</span>
+                                                <Input 
+                                                    value={displayOrder} 
+                                                    onChange={e => setDisplayOrder(e.target.value)} 
+                                                    className="h-8 w-20 text-xs border-medical-border" 
+                                                    placeholder="2" 
+                                                    type="number"
+                                                />
+                                            </div>
                                         </div>
                                         <div>
                                             <Label className="text-[11px] text-slate-500 mb-0.5 block">Normal Range</Label>
-                                            <Input value={attrNormalRange} onChange={e => setAttrNormalRange(e.target.value)} className="h-8 text-xs border-medical-border" placeholder="e.g. 0.9 - 1.1" />
+                                            <Input 
+                                                value={normalRangeDisplay} 
+                                                onChange={e => setNormalRangeDisplay(e.target.value)} 
+                                                className="h-8 text-xs border-medical-border" 
+                                                placeholder="Normal Range Display" 
+                                            />
                                         </div>
                                     </div>
-                                    {/* ── Add your attributes list/table here ── */}
-                                    <div className="border-2 border-dashed border-blue-100 rounded-lg p-8 text-center text-slate-400 text-xs italic">
+
+                                    {/* Add Test button */}
+                                    <div className="flex justify-end">
+                                        <Button className="h-8 text-xs bg-medical-accent hover:bg-blue-600 text-white px-6">
+                                            <Plus className="h-3.5 w-3.5 mr-1" /> Add Test
+                                        </Button>
+                                    </div>
+
+                                    {/* Gender selection for attributes */}
+                                    <div className="border-t border-blue-100 pt-4">
+                                        <Label className="text-[11px] text-slate-500 mb-2 block">Gender Specific Ranges</Label>
+                                        <RadioGroup value={genderAttribute} onValueChange={setGenderAttribute} className="flex gap-6 mb-3">
+                                            {["both", "male", "female", "child"].map(g => (
+                                                <div key={g} className="flex items-center space-x-1.5">
+                                                    <RadioGroupItem value={g} id={`attr-${g}`} />
+                                                    <Label htmlFor={`attr-${g}`} className="text-xs text-slate-700 capitalize">{g}</Label>
+                                                </div>
+                                            ))}
+                                        </RadioGroup>
+
+                                        {/* Min/Max Value inputs */}
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3">
+                                            <div>
+                                                <Label className="text-[11px] text-slate-500 mb-0.5 block">Min Value</Label>
+                                                <Input 
+                                                    value={minValue} 
+                                                    onChange={e => setMinValue(e.target.value)} 
+                                                    className="h-8 text-xs border-medical-border" 
+                                                    placeholder="Enter minimum value" 
+                                                    type="number"
+                                                />
+                                            </div>
+                                            <div>
+                                                <Label className="text-[11px] text-slate-500 mb-0.5 block">Max Value</Label>
+                                                <Input 
+                                                    value={maxValue} 
+                                                    onChange={e => setMaxValue(e.target.value)} 
+                                                    className="h-8 text-xs border-medical-border" 
+                                                    placeholder="Enter maximum value" 
+                                                    type="number"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Existing attributes list/table */}
+                                    <div className="border-2 border-dashed border-blue-100 rounded-lg p-4 text-center text-slate-400 text-xs italic mt-4">
                                         Attributes data will appear here
                                     </div>
                                 </div>
@@ -314,10 +484,7 @@ const LabTests = () => {
 
                         <div className="border-2 border-blue-100 rounded-lg overflow-hidden">
                             {/* Header */}
-                            <div className="grid grid-cols-[40px_50px_160px_120px_70px_1fr_90px_90px] bg-slate-50/80 border-b border-blue-100 px-3 py-2">
-                                <div className="flex items-center">
-                                    <Checkbox checked={selectedIds.length === tests.length && tests.length > 0} onCheckedChange={toggleSelectAll} className="h-3.5 w-3.5" />
-                                </div>
+                            <div className="grid grid-cols-[50px_160px_120px_70px_1fr_90px_90px] bg-slate-50/80 border-b border-blue-100 px-3 py-2">
                                 {["Sr.", "Type", "Category", "Code", "Test Name", "Amount", "Result"].map(h => (
                                     <span key={h} className="text-[11px] font-bold text-medical-blue flex items-center">{h}</span>
                                 ))}
@@ -328,10 +495,7 @@ const LabTests = () => {
                                 {filtered.length === 0 ? (
                                     <div className="text-center py-10 text-slate-400 text-xs italic">No tests found.</div>
                                 ) : filtered.map(test => (
-                                    <div key={test.id} className={cn("grid grid-cols-[40px_50px_160px_120px_70px_1fr_90px_90px] px-3 py-2 transition-colors", selectedIds.includes(test.id) ? "bg-blue-50" : "hover:bg-slate-50/80")}>
-                                        <div className="flex items-center">
-                                            <Checkbox checked={selectedIds.includes(test.id)} onCheckedChange={() => toggleSelection(test.id)} className="h-3.5 w-3.5" />
-                                        </div>
+                                    <div key={test.id} className="grid grid-cols-[50px_160px_120px_70px_1fr_90px_90px] px-3 py-2 transition-colors hover:bg-slate-50/80">
                                         <span className="text-xs text-slate-500 flex items-center">{test.sr}</span>
                                         <span className="text-[11px] text-slate-700 flex items-center truncate pr-2">{test.type}</span>
                                         <span className="text-[11px] text-slate-500 flex items-center truncate pr-2">{test.category || "—"}</span>
@@ -343,28 +507,8 @@ const LabTests = () => {
                                 ))}
                             </div>
                         </div>
-
-                        {selectedIds.length > 0 && <p className="text-[11px] text-medical-accent font-medium">{selectedIds.length} item{selectedIds.length > 1 ? "s" : ""} selected</p>}
-
-                        <Separator />
-
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm" disabled={selectedIds.length !== 1} className="h-8 text-xs border-medical-border text-slate-600 hover:bg-slate-50">
-                                    <Pencil className="h-3.5 w-3.5 mr-1" /> Modify
-                                </Button>
-                                <Button variant="outline" size="sm" onClick={handleDelete} disabled={selectedIds.length === 0} className="h-8 text-xs border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700">
-                                    <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
-                                </Button>
-                            </div>
-                            <Button variant="outline" size="sm" className="h-8 text-xs border-medical-border text-slate-500 hover:bg-slate-50">
-                                <X className="h-3.5 w-3.5 mr-1" /> Exit
-                            </Button>
-                        </div>
-
                     </CardContent>
                 </Card>
-
             </div>
         </div>
     );

@@ -383,7 +383,7 @@ const LaboratoryReceipt = () => {
                                     />
                                     <Button
                                         onClick={handleAddTest}
-                                        className="h-8 text-xs bg-[#00B5AE] hover:bg-[#7FDAD6] text-white px-3"
+                                        variant="default"
                                     >
                                         <Plus className="h-3.5 w-3.5 mr-1" /> Add
                                     </Button>
@@ -447,7 +447,7 @@ const LaboratoryReceipt = () => {
                                                     <div className="flex items-center justify-end">
                                                         <button
                                                             onClick={() => removeTest(test.id)}
-                                                            className="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
+                                                            className="text-red-400 hover:text-red-600 hover:bg-red-100! p-1 rounded transition-colors"
                                                         >
                                                             <X className="h-3 w-3" />
                                                         </button>
@@ -464,7 +464,7 @@ const LaboratoryReceipt = () => {
                                         variant="outline"
                                         size="sm"
                                         onClick={handleDeleteSelected}
-                                        className="mt-2 h-7 text-[10px] border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700"
+                                        className="mt-2 h-7 text-[10px] border-red-200 text-red-500 hover:bg-red-100! hover:text-red-700"
                                     >
                                         <Trash2 className="h-3 w-3 mr-1" />
                                         Delete Selected ({selectedTestIds.length})
@@ -693,7 +693,7 @@ const LaboratoryReceipt = () => {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="h-8 text-xs font-semibold border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700"
+                                        className="h-8 text-xs font-semibold border-red-200 text-red-500 hover:bg-red-100! hover:text-red-700"
                                     >
                                         <Trash2 className="h-3.5 w-3.5 mr-1" /> Delete
                                     </Button>
@@ -703,7 +703,7 @@ const LaboratoryReceipt = () => {
                                 <Button
                                     onClick={handlePrint}
                                     disabled={submitting}
-                                    className="w-full h-9 text-xs font-semibold bg-[#00B5AE] hover:bg-blue-600 text-white"
+                                    variant="default"
                                 >
                                     {submitting ? (
                                         <span className="flex items-center gap-1.5">
